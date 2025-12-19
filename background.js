@@ -1,5 +1,5 @@
 // Background service worker for Chrome extension
-// Handles extension installation and side panel
+// Handles extension installation
 
 chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === 'install') {
@@ -7,9 +7,4 @@ chrome.runtime.onInstalled.addListener((details) => {
     } else if (details.reason === 'update') {
         console.log('Extension updated to version:', chrome.runtime.getManifest().version);
     }
-});
-
-// Open side panel when extension icon is clicked
-chrome.action.onClicked.addListener((tab) => {
-    chrome.sidePanel.open({ windowId: tab.windowId });
 });
