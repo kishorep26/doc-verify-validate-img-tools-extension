@@ -1,45 +1,80 @@
 // Content script - Creates always-on collapsible side panel
+console.log('Document Verify Extension: Content script loaded');
+
 let panelState = {
     isOpen: false,
     element: null
 };
 
-// Initialize on page load
-initializePanel();
+// Wait for page to be fully loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializePanel);
+} else {
+    initializePanel();
+}
 
 function initializePanel() {
-    // Create panel HTML
-    const panel = document.createElement('div');
-    panel.id = 'doc-verify-extension';
-    panel.className = 'doc-verify-panel';
+    console.log('Initializing panel...');
 
-    panel.innerHTML = `
-        <div class="panel-toggle-tab" id="panelToggle">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 18l6-6-6-6"/>
-            </svg>
-        </div>
-        <div class="panel-content">
-            <div class="panel-header">
-                <h2>Document Verify & Image Tools</h2>
-                <button class="close-btn" id="closePanel">×</button>
+    try {
+        // Check if panel already exists
+        if (document.getElementById('doc-verify-extension')) {
+            console.log('Panel already exists');
+            return;
+        }
+
+        // Create panel HTML
+        const panel = document.createElement('div');
+        panel.id = 'doc-verify-extension';
+        panel.className = 'doc-verify-panel';
+
+        const extensionURL = chrome.runtime.getURL('popup.html');
+        console.log('Extension URL:', extensionURL);
+
+        panel.innerHTML = `
+            <div class="panel-toggle-tab" id="panelToggle">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
             </div>
-            <iframe src="${chrome.runtime.getURL('popup.html')}" id="panelFrame"></iframe>
-        </div>
-    `;
+            <div class="panel-content">
+                <div class="panel-header">
+                    <h2>Document Verify & Image Tools</h2>
+                    <button class="close-btn" id="closePanel">×</button>
+                </div>
+                <iframe src="${extensionURL}" id="panelFrame"></iframe>
+            </div>
+        `;
 
-    document.body.appendChild(panel);
-    panelState.element = panel;
+        document.body.appendChild(panel);
+        panelState.element = panel;
+        console.log('Panel added to DOM');
 
-    // Add event listeners
-    document.getElementById('panelToggle').addEventListener('click', togglePanel);
-    document.getElementById('closePanel').addEventListener('click', closePanel);
+        // Add event listeners
+        const toggleBtn = document.getElementById('panelToggle');
+        const closeBtn = document.getElementById('closePanel');
 
-    // Inject styles
-    injectStyles();
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', togglePanel);
+            console.log('Toggle button listener added');
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closePanel);
+            console.log('Close button listener added');
+        }
+
+        // Inject styles
+        injectStyles();
+        console.log('Panel initialized successfully');
+
+    } catch (error) {
+        console.error('Error initializing panel:', error);
+    }
 }
 
 function togglePanel() {
+    console.log('Toggle panel clicked');
     if (panelState.isOpen) {
         closePanel();
     } else {
@@ -48,16 +83,27 @@ function togglePanel() {
 }
 
 function openPanel() {
-    panelState.element.classList.add('open');
-    panelState.isOpen = true;
+    console.log('Opening panel');
+    if (panelState.element) {
+        panelState.element.classList.add('open');
+        panelState.isOpen = true;
+    }
 }
 
 function closePanel() {
-    panelState.element.classList.remove('open');
-    panelState.isOpen = false;
+    console.log('Closing panel');
+    if (panelState.element) {
+        panelState.element.classList.remove('open');
+        panelState.isOpen = false;
+    }
 }
 
 function injectStyles() {
+    // Check if styles already injected
+    if (document.getElementById('doc-verify-styles')) {
+        return;
+    }
+
     const style = document.createElement('style');
     style.id = 'doc-verify-styles';
     style.textContent = `
@@ -79,8 +125,7 @@ function injectStyles() {
         .doc-verify-panel .panel-toggle-tab {
             position: absolute;
             left: -50px;
-            top: 50%;
-            transform: translateY(-50%);
+            top: 100px;
             width: 50px;
             height: 80px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -100,10 +145,11 @@ function injectStyles() {
         }
         
         .doc-verify-panel.open .panel-toggle-tab svg {
-            transform: rotate(180deg);
+            transform: rotate(0deg);
         }
         
         .doc-verify-panel .panel-toggle-tab svg {
+            transform: rotate(180deg);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
@@ -161,7 +207,6 @@ function injectStyles() {
             background: #f8f9fa;
         }
         
-        /* Animation for toggle tab pulse */
         @keyframes pulse {
             0%, 100% {
                 box-shadow: -4px 0 12px rgba(0,0,0,0.15);
@@ -176,13 +221,17 @@ function injectStyles() {
         }
     `;
     document.head.appendChild(style);
+    console.log('Styles injected');
 }
 
 // Listen for messages from background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log('Message received:', request);
     if (request.action === 'toggle') {
         togglePanel();
         sendResponse({ success: true });
     }
     return true;
 });
+
+console.log('Content script setup complete');

@@ -110,6 +110,7 @@ let currentImage = null;
 let originalWidth = 0;
 let originalHeight = 0;
 let currentImageData = null;
+let originalFileSize = 0; // Track original file size
 
 document.getElementById('uploadArea').addEventListener('click', () => {
     document.getElementById('imageInput').click();
@@ -124,6 +125,8 @@ document.getElementById('imageInput').addEventListener('change', (e) => {
         return;
     }
 
+    originalFileSize = file.size; // Store original file size
+
     const reader = new FileReader();
     reader.onload = (event) => {
         const img = new Image();
@@ -137,10 +140,17 @@ document.getElementById('imageInput').addEventListener('change', (e) => {
             document.getElementById('imagePreview').style.display = 'block';
             document.getElementById('toolButtons').style.display = 'grid';
 
+            let fileSizeText;
+            if (file.size < 1024 * 1024) {
+                fileSizeText = `${(file.size / 1024).toFixed(1)} KB`;
+            } else {
+                fileSizeText = `${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+            }
+
             const info = `
                 <strong>Image Info:</strong><br>
                 Size: ${originalWidth} × ${originalHeight}px<br>
-                File: ${(file.size / 1024).toFixed(2)} KB
+                File: ${fileSizeText}
             `;
             document.getElementById('imageInfo').innerHTML = info;
         };
@@ -252,10 +262,57 @@ function initCropPreview() {
     const displayWidth = originalWidth * scale;
     const displayHeight = originalHeight * scale;
 
+    // Calculate selection box size based on aspect ratio
+    let selectionStyle = '';
+
+    if (ratio === 'free') {
+        // Free crop - start with 80% of image
+        selectionStyle = 'left: 10%; top: 10%; width: 80%; height: 80%;';
+    } else {
+        // Parse aspect ratio (e.g., "16:9" -> 16/9)
+        const [w, h] = ratio.split(':').map(Number);
+        const aspectRatio = w / h;
+        const imageAspectRatio = originalWidth / originalHeight;
+
+        let selWidth, selHeight, selLeft, selTop;
+
+        if (imageAspectRatio > aspectRatio) {
+            // Image is wider - constrain by height
+            selHeight = displayHeight * 0.8;
+            selWidth = selHeight * aspectRatio;
+            selLeft = (displayWidth - selWidth) / 2;
+            selTop = displayHeight * 0.1;
+        } else {
+            // Image is taller - constrain by width
+            selWidth = displayWidth * 0.8;
+            selHeight = selWidth / aspectRatio;
+            selLeft = displayWidth * 0.1;
+            selTop = (displayHeight - selHeight) / 2;
+        }
+
+        selectionStyle = `left: ${selLeft}px; top: ${selTop}px; width: ${selWidth}px; height: ${selHeight}px;`;
+    }
+
+    // Add resize handles
+    const handles = ratio === 'free'
+        ? `<div class="resize-handle nw"></div>
+           <div class="resize-handle ne"></div>
+           <div class="resize-handle sw"></div>
+           <div class="resize-handle se"></div>
+           <div class="resize-handle n"></div>
+           <div class="resize-handle s"></div>
+           <div class="resize-handle e"></div>
+           <div class="resize-handle w"></div>`
+        : `<div class="resize-handle nw"></div>
+           <div class="resize-handle ne"></div>
+           <div class="resize-handle sw"></div>
+           <div class="resize-handle se"></div>`;
+
     container.innerHTML = `
         <div class="crop-preview-container" style="width: ${displayWidth}px; height: ${displayHeight}px; position: relative; margin: 15px auto;">
             <img src="${currentImageData}" class="crop-preview-image" style="width: 100%; height: 100%; display: block;">
-            <div class="crop-selection" id="cropSelection" style="left: 10%; top: 10%; width: 80%; height: 80%;">
+            <div class="crop-selection" id="cropSelection" style="${selectionStyle}" data-ratio="${ratio}">
+                ${handles}
                 <div class="crop-dimensions" id="cropDimensions"></div>
             </div>
         </div>
@@ -263,6 +320,7 @@ function initCropPreview() {
 
     const selection = document.getElementById('cropSelection');
     makeDraggable(selection, scale);
+    makeResizable(selection, scale, ratio);
     updateCropDimensions();
 }
 
@@ -295,6 +353,92 @@ function makeDraggable(element, scale) {
 
     document.addEventListener('mouseup', () => {
         isDragging = false;
+    });
+}
+
+function makeResizable(element, scale, ratio) {
+    const handles = element.querySelectorAll('.resize-handle');
+    const container = element.parentElement;
+
+    handles.forEach(handle => {
+        let isResizing = false;
+        let startX, startY, startWidth, startHeight, startLeft, startTop;
+        const handleClass = handle.className.split(' ')[1]; // nw, ne, sw, se, n, s, e, w
+
+        handle.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startWidth = element.offsetWidth;
+            startHeight = element.offsetHeight;
+            startLeft = element.offsetLeft;
+            startTop = element.offsetTop;
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+
+            let newWidth = startWidth;
+            let newHeight = startHeight;
+            let newLeft = startLeft;
+            let newTop = startTop;
+
+            // Calculate new dimensions based on handle
+            if (ratio === 'free') {
+                // Free resize - any direction
+                if (handleClass.includes('e')) newWidth = startWidth + dx;
+                if (handleClass.includes('w')) { newWidth = startWidth - dx; newLeft = startLeft + dx; }
+                if (handleClass.includes('s')) newHeight = startHeight + dy;
+                if (handleClass.includes('n')) { newHeight = startHeight - dy; newTop = startTop + dy; }
+            } else {
+                // Locked aspect ratio - corners only
+                const [w, h] = ratio.split(':').map(Number);
+                const aspectRatio = w / h;
+
+                if (handleClass === 'se') {
+                    newWidth = startWidth + dx;
+                    newHeight = newWidth / aspectRatio;
+                } else if (handleClass === 'sw') {
+                    newWidth = startWidth - dx;
+                    newHeight = newWidth / aspectRatio;
+                    newLeft = startLeft + dx;
+                } else if (handleClass === 'ne') {
+                    newWidth = startWidth + dx;
+                    newHeight = newWidth / aspectRatio;
+                    newTop = startTop - (newHeight - startHeight);
+                } else if (handleClass === 'nw') {
+                    newWidth = startWidth - dx;
+                    newHeight = newWidth / aspectRatio;
+                    newLeft = startLeft + dx;
+                    newTop = startTop - (newHeight - startHeight);
+                }
+            }
+
+            // Constrain to container bounds
+            const maxWidth = container.offsetWidth - newLeft;
+            const maxHeight = container.offsetHeight - newTop;
+
+            if (newWidth > 20 && newWidth <= maxWidth && newLeft >= 0) {
+                element.style.width = newWidth + 'px';
+                element.style.left = newLeft + 'px';
+            }
+
+            if (newHeight > 20 && newHeight <= maxHeight && newTop >= 0) {
+                element.style.height = newHeight + 'px';
+                element.style.top = newTop + 'px';
+            }
+
+            updateCropDimensions();
+        });
+
+        document.addEventListener('mouseup', () => {
+            isResizing = false;
+        });
     });
 }
 
@@ -354,9 +498,19 @@ function showCompressOptions() {
         const quality = e.target.value;
         document.getElementById('qualityValue').textContent = quality;
 
-        // Show estimated size
-        const estimatedSize = Math.round((originalWidth * originalHeight * quality) / 10000);
-        document.getElementById('compressPreview').textContent = `Estimated size: ~${estimatedSize}KB`;
+        // Estimate based on original file size and quality
+        const estimatedBytes = originalFileSize * (quality / 100);
+
+        let sizeText;
+        if (estimatedBytes < 1024) {
+            sizeText = `${Math.round(estimatedBytes)} B`;
+        } else if (estimatedBytes < 1024 * 1024) {
+            sizeText = `${(estimatedBytes / 1024).toFixed(1)} KB`;
+        } else {
+            sizeText = `${(estimatedBytes / (1024 * 1024)).toFixed(2)} MB`;
+        }
+
+        document.getElementById('compressPreview').textContent = `Estimated size: ~${sizeText}`;
     });
 
     // Trigger initial preview
