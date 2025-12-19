@@ -9,7 +9,6 @@
         "128": "icons/icon128.png"
     },
     "action": {
-        "default_popup": "popup.html",
         "default_title": "Document Verify & Image Tools",
         "default_icon": {
             "16": "icons/icon16.png",
@@ -19,9 +18,36 @@
     },
     "permissions": [
         "storage",
-        "downloads"
+        "downloads",
+        "activeTab"
     ],
-    "host_permissions": [],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "run_at": "document_end"
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "panel.html",
+                "popup.js",
+                "styles.css",
+                "icons/*"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ],
     "background": {
         "service_worker": "background.js"
     },

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Verify & Image Tools</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Document Verify & Image Tools</h1>
+            <p>Verify documents and process images</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="home">Home</button>
+            <button class="nav-tab" data-tab="aadhar">Aadhar</button>
+            <button class="nav-tab" data-tab="pan">PAN</button>
+            <button class="nav-tab" data-tab="image">Image Tools</button>
+        </div>
+
+        <!-- Home Tab -->
+        <div class="tab-content active" id="home-tab">
+            <div class="feature-grid">
+                <div class="feature-card" data-navigate="aadhar">
+                    <h3>Aadhar Verification</h3>
+                    <p>Validate Aadhar card numbers with Verhoeff algorithm</p>
+                </div>
+                <div class="feature-card" data-navigate="pan">
+                    <h3>PAN Validation</h3>
+                    <p>Verify PAN card format and structure</p>
+                </div>
+                <div class="feature-card" data-navigate="image">
+                    <h3>Image Processing</h3>
+                    <p>Resize, crop, compress & convert images</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aadhar Tab -->
+        <div class="tab-content" id="aadhar-tab">
+            <h2>Aadhar Number Validation</h2>
+            <div class="form-group">
+                <label for="aadharNumber">Enter 12-digit Aadhar Number</label>
+                <input type="text" id="aadharNumber" placeholder="XXXX XXXX XXXX" maxlength="14">
+            </div>
+            <button class="btn btn-primary" id="verifyAadhar">Verify Aadhar</button>
+            <div id="aadharResult" class="result"></div>
+        </div>
+
+        <!-- PAN Tab -->
+        <div class="tab-content" id="pan-tab">
+            <h2>PAN Number Validation</h2>
+            <div class="form-group">
+                <label for="panNumber">Enter 10-character PAN Number</label>
+                <input type="text" id="panNumber" placeholder="ABCDE1234F" maxlength="10">
+            </div>
+            <button class="btn btn-primary" id="verifyPAN">Validate PAN</button>
+            <div id="panResult" class="result"></div>
+        </div>
+
+        <!-- Image Tools Tab -->
+        <div class="tab-content" id="image-tab">
+            <h2>Image Processing Tools</h2>
+
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-text">Click to upload image</div>
+                <div class="upload-hint">JPG, PNG, WEBP (Max 10MB)</div>
+                <input type="file" id="imageInput" accept="image/*" style="display: none;">
+            </div>
+
+            <div id="imagePreview" style="display: none;">
+                <img id="previewImg" style="max-width: 100%; border-radius: 8px; margin: 15px 0;">
+                <div class="image-info" id="imageInfo"></div>
+            </div>
+
+            <div class="tool-buttons" id="toolButtons" style="display: none;">
+                <button class="btn btn-secondary" id="resizeBtn">Resize</button>
+                <button class="btn btn-secondary" id="cropBtn">Crop</button>
+                <button class="btn btn-secondary" id="compressBtn">Compress</button>
+                <button class="btn btn-secondary" id="convertBtn">Convert</button>
+            </div>
+
+            <div id="imageToolOptions" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>
