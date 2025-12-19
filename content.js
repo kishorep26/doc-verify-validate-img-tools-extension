@@ -91,9 +91,10 @@ function openPanel() {
 }
 
 function closePanel() {
-    console.log('Closing panel');
+    console.log('Closing panel completely');
     if (panelState.element) {
-        panelState.element.classList.remove('open');
+        panelState.element.remove();
+        panelState.element = null;
         panelState.isOpen = false;
     }
 }
