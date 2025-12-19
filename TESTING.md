@@ -1,120 +1,111 @@
-# Testing Guide
+# Extension Testing Guide
 
-## Quick Test Checklist
+## How to Install
 
-### 1. Load Extension in Chrome
-- [ ] Open `chrome://extensions/`
-- [ ] Enable "Developer mode"
-- [ ] Click "Load unpacked"
-- [ ] Select the `Document-Verify-Extension` folder
-- [ ] Extension loads without errors
+1. **Remove old version** (if installed):
+   - Go to `chrome://extensions/`
+   - Find "Document Verify & Image Tools"
+   - Click "Remove"
 
-### 2. Test Aadhar Verification
-- [ ] Click extension icon
-- [ ] Navigate to "Aadhar" tab
-- [ ] Test valid number: `234567890124` (should pass)
-- [ ] Test invalid number: `123456789012` (should fail - starts with 1)
-- [ ] Test invalid checksum: `234567890123` (should fail - wrong checksum)
-- [ ] Auto-formatting works (adds spaces)
+2. **Load new version**:
+   - Go to `chrome://extensions/`
+   - Enable "Developer mode" (top right)
+   - Click "Load unpacked"
+   - Select: `/Users/kishoreprashanth/Developer/Document-Verify-Extension`
 
-### 3. Test PAN Validation
-- [ ] Navigate to "PAN" tab
-- [ ] Test valid PAN: `ABCDE1234F` (Individual)
-- [ ] Test valid PAN: `ABCDC1234F` (Company)
-- [ ] Test invalid format: `ABC123456` (should fail)
-- [ ] Test invalid type: `ABCDK1234F` (should fail - K is invalid)
-- [ ] Auto-uppercase works
+3. **Reload extension** after any updates:
+   - Click the reload icon on the extension card
 
-### 4. Test Image Tools
+## How It Works
 
-#### Resize
-- [ ] Upload a test image (< 10MB)
-- [ ] Image preview appears
-- [ ] Click "Resize"
-- [ ] Enter width only - height auto-calculates
-- [ ] Enter height only - width auto-calculates
-- [ ] Click "Resize & Download"
-- [ ] File downloads successfully
+### Always-On Side Panel
+- **Auto-loads** on every webpage
+- **Toggle tab** appears on the right edge (purple gradient tab)
+- Click the tab or extension icon to open/close
+- **Close button** (×) in the header when open
 
-#### Crop
-- [ ] Upload image
-- [ ] Click "Crop"
-- [ ] Select aspect ratio (1:1, 4:3, etc.)
-- [ ] Click "Crop & Download"
-- [ ] Cropped image downloads
+### Features to Test
 
-#### Compress
-- [ ] Upload image
-- [ ] Click "Compress"
-- [ ] Adjust quality slider
-- [ ] Click "Compress & Download"
-- [ ] Compressed image downloads
+#### 1. Aadhar Verification
+- Enter: `234567890124` (valid)
+- Should show ✓ with green animation
+- Enter: `123456789012` (invalid)
+- Should show ✗ with red shake animation
 
-#### Convert
-- [ ] Upload image
-- [ ] Click "Convert"
-- [ ] Select format (JPEG, PNG, WebP)
-- [ ] Click "Convert & Download"
-- [ ] Converted image downloads
+#### 2. PAN Validation  
+- Enter: `ABCDE1234F` (valid)
+- Should show ✓ with holder type
+- Enter: `ABC123456` (invalid)
+- Should show ✗ error
 
-### 5. UI/UX Tests
-- [ ] All tabs switch correctly
-- [ ] Feature cards on home navigate to correct tabs
-- [ ] Buttons are clickable and responsive
-- [ ] Results display correctly (success/error)
-- [ ] Extension popup size is appropriate (400x500px)
-- [ ] No console errors
+#### 3. Image Tools
 
-### 6. Edge Cases
-- [ ] Upload file > 10MB (should show alert)
-- [ ] Empty inputs show appropriate errors
-- [ ] Multiple operations in sequence work
-- [ ] Extension works offline
+**Upload Test Image**:
+- Click "Click to upload image"
+- Select any image (< 10MB)
+- Image preview should appear
 
-## Test Data
+**Resize**:
+- Enter width OR height
+- Other dimension auto-calculates
+- Click "Resize & Download"
+- File downloads
 
-### Valid Aadhar Numbers
-- `234567890124`
-- `987654321098`
+**Crop**:
+- Select aspect ratio from dropdown
+- Preview updates dynamically
+- Drag the selection box
+- See dimensions update
+- Click "Crop & Download"
 
-### Invalid Aadhar Numbers
-- `123456789012` (starts with 1)
-- `234567890123` (wrong checksum)
-- `12345` (too short)
+**Compress**:
+- Adjust quality slider (1-100%)
+- See estimated size
+- Click "Compress & Download"
+- File downloads with quality in filename
 
-### Valid PAN Numbers
-- `ABCDE1234F` (Individual)
-- `ABCDC1234F` (Company)
-- `ABCDH1234F` (HUF)
-- `ABCDF1234F` (Firm)
+**Convert**:
+- Select format (JPEG/PNG/WebP)
+- Click "Convert & Download"
+- File downloads in new format
 
-### Invalid PAN Numbers
-- `ABC123456` (wrong format)
-- `ABCDK1234F` (invalid type)
-- `abcde1234f` (lowercase - should auto-convert)
+## Known Features
 
-## Browser Compatibility
-- [ ] Chrome (latest)
-- [ ] Edge (Chromium-based)
-- [ ] Brave
-- [ ] Opera
+✅ **Working**:
+- Always-on collapsible panel
+- Toggle tab with icon
+- Close button
+- All verification features
+- Image resize with auto-calculation
+- Dynamic crop preview
+- Compress with quality control
+- Format conversion
+- Smooth animations
+- Professional UI with Inter font
+- New shield icon
 
-## Performance Tests
-- [ ] Extension loads in < 1 second
-- [ ] Image processing completes in reasonable time
-- [ ] No memory leaks after multiple operations
-- [ ] Popup remains responsive
+## Troubleshooting
 
-## Before Publishing
-- [ ] All tests pass
-- [ ] No console errors or warnings
-- [ ] Icons display correctly in all sizes
-- [ ] README is complete
-- [ ] Privacy policy is accurate
-- [ ] Manifest version is correct
-- [ ] Screenshots prepared for store listing
+**Panel not appearing?**
+- Refresh the webpage
+- Check console for errors (F12)
+- Reload extension
 
-## Known Limitations
-- Maximum image size: 10MB
-- Supported formats: JPG, PNG, WEBP
-- Requires Chrome 88+ (Manifest V3)
+**Downloads not working?**
+- Check downloads permission in manifest
+- Look in Chrome downloads folder
+
+**Crop preview not updating?**
+- Make sure image is uploaded first
+- Try different aspect ratios
+
+## UI Features
+
+- Inter font family (modern, clean)
+- Smooth cubic-bezier transitions
+- Success/error animations
+- Hover effects on all interactive elements
+- Gradient backgrounds
+- Professional color scheme
+- 500px wide panel
+- Responsive layout

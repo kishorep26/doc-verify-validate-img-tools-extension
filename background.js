@@ -1,19 +1,18 @@
-// Background service worker for Chrome extension
+// Background service worker
 
 chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === 'install') {
-        console.log('Extension installed successfully!');
+        console.log('Document Verify Extension installed!');
     } else if (details.reason === 'update') {
         console.log('Extension updated to version:', chrome.runtime.getManifest().version);
     }
 });
 
-// Handle extension icon click - toggle side panel
+// Toggle panel when extension icon is clicked
 chrome.action.onClicked.addListener(async (tab) => {
-    // Send message to content script to toggle panel
     try {
-        await chrome.tabs.sendMessage(tab.id, { action: 'togglePanel' });
+        await chrome.tabs.sendMessage(tab.id, { action: 'toggle' });
     } catch (error) {
-        console.log('Could not inject panel:', error);
+        console.log('Panel toggle error:', error);
     }
 });

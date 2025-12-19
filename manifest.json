@@ -9,12 +9,7 @@
         "128": "icons/icon128.png"
     },
     "action": {
-        "default_title": "Document Verify & Image Tools",
-        "default_icon": {
-            "16": "icons/icon16.png",
-            "48": "icons/icon48.png",
-            "128": "icons/icon128.png"
-        }
+        "default_title": "Toggle Document Verify Panel"
     },
     "permissions": [
         "storage",
@@ -32,13 +27,13 @@
             "js": [
                 "content.js"
             ],
-            "run_at": "document_end"
+            "run_at": "document_idle"
         }
     ],
     "web_accessible_resources": [
         {
             "resources": [
-                "panel.html",
+                "popup.html",
                 "popup.js",
                 "styles.css",
                 "icons/*"
