@@ -16,15 +16,6 @@ A Chrome extension for verifying Aadhar and PAN cards and processing images with
 - **Convert**: Convert between JPEG, PNG, and WebP formats
 - **Client-side Processing**: All image processing happens in your browser
 
-## Installation
-
-1. Download or clone this repository
-2. Open Chrome and navigate to `chrome://extensions/`
-3. Enable "Developer mode" (toggle in top-right corner)
-4. Click "Load unpacked"
-5. Select the extension folder
-6. The extension will appear in your extensions list
-
 ## Usage
 
 ### Aadhar Verification
