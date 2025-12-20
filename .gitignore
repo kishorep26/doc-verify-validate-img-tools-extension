@@ -15,3 +15,7 @@ node_modules/
 # Temporary files
 *.log
 *.tmp
+
+# Documentation (except README.md)
+*.md
+!README.md
