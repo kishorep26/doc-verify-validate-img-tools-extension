@@ -16,8 +16,9 @@ node_modules/
 *.log
 *.tmp
 
-# Documentation (except README.md and PRIVACY_POLICY.md)
+# Documentation (except important files)
 *.md
 !README.md
 !PRIVACY_POLICY.md
 !RESUBMISSION_GUIDE.md
+!FIXES_SUMMARY.md
