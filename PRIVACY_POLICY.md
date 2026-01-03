@@ -85,7 +85,7 @@ This Extension's source code is available for review, allowing you to verify our
 If you have questions or concerns about this privacy policy, please contact:
 
 **Developer**: Kishore Prashanth  
-**Email**: [Your Email Address]  
+**Email**: kishorep.shrivatsa@gmail.com
 **GitHub**: https://github.com/kishorep26/doc-verify-validate-img-tools-extension
 
 ## Your Rights
