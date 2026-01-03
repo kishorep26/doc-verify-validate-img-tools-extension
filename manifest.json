@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Document Verify & Image Tools",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Verify Aadhar & PAN cards, and process images with resize, crop, compress & convert tools",
     "icons": {
         "16": "icons/icon16.png",
@@ -9,39 +9,12 @@
         "128": "icons/icon128.png"
     },
     "action": {
-        "default_title": "Toggle Document Verify Panel"
+        "default_popup": "popup.html",
+        "default_title": "Document Verify & Image Tools"
     },
     "permissions": [
         "storage",
-        "downloads",
-        "activeTab"
-    ],
-    "host_permissions": [
-        "<all_urls>"
-    ],
-    "content_scripts": [
-        {
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": [
-                "content.js"
-            ],
-            "run_at": "document_idle"
-        }
-    ],
-    "web_accessible_resources": [
-        {
-            "resources": [
-                "popup.html",
-                "popup.js",
-                "styles.css",
-                "icons/*"
-            ],
-            "matches": [
-                "<all_urls>"
-            ]
-        }
+        "downloads"
     ],
     "background": {
         "service_worker": "background.js"
